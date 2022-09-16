@@ -1,29 +1,60 @@
 import React from "react";
-//import components here
-import { Routes, Route } from 'react-router-dom';
+import MultilineChart from "./views/MultilineChart";
+import Legend from "./components/Legend";
+import schc from "./SCHC.json";
+import vcit from "./VCIT.json";
+import portfolio from "./portfolio.json";
+import "./styles.css";
 
-function App(){
+const portfolioData = {
+  name: "Portfolio",
+  color: "#ffffff",
+  items: portfolio.map((d) => ({ ...d, date: new Date(d.date) }))
+};
+const schcData = {
+  name: "SCHC",
+  color: "#d53e4f",
+  items: schc.map((d) => ({ ...d, date: new Date(d.date) }))
+};
+const vcitData = {
+  name: "VCIT",
+  color: "#5e4fa2",
+  items: vcit.map((d) => ({ ...d, date: new Date(d.date) }))
+};
 
-    return(
-        
-       <div id='main'>
-            <div className='column container'>
-                <div id='header'>
-                    <h1>Title of Project</h1>
-                    {/* <Navbar/> */}
-                </div>
-            </div>
+const dimensions = {
+  width: 630,
+  height: 300,
+  margin: {
+    top: 30,
+    right: 30,
+    bottom: 30,
+    left: 30
+  }
+};
 
-            {/* <Routes>
-                <Route path='/path1' element={<path1element/>}/>
-                <Route path='/path2' element={<path2element/>}/>
-                <Route path='/path1/:path1Id/' element={<path1childelement/>}/>
-                <Route path='/path2/:path2Id/' element={<path2childelement/>}/>
-                <Route path='/' element={<whateverimakehome/>}/>
-            </Routes> */}
-       </div>
-       
-    )
+export default function App() {
+  const [selectedItems, setSelectedItems] = React.useState([]);
+  const legendData = [portfolioData, schcData, vcitData];
+  const chartData = [
+    portfolioData,
+    ...[schcData, vcitData].filter((d) => selectedItems.includes(d.name))
+  ];
+  const onChangeSelection = (name) => {
+    const newSelectedItems = selectedItems.includes(name)
+      ? selectedItems.filter((item) => item !== name)
+      : [...selectedItems, name];
+    setSelectedItems(newSelectedItems);
+  };
+
+  return (
+    <div className="App">
+      <Legend
+        data={legendData}
+        selectedItems={selectedItems}
+        onChange={onChangeSelection}
+      />
+      <MultilineChart data={chartData} dimensions={dimensions} />
+    </div>
+  );
 }
-
-export default App;
